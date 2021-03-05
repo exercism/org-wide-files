@@ -1,5 +1,12 @@
 # org-wide-files
 
+## How it works
+
+On each push to the `main` branch, all files in `synced-files/` will be copied to all Exercism track repos.
+A PR will be opened on each repo, which will (in the future) be automatically merged by a webhook integration.
+
+After pushing, you have 5 minutes to abort the workflow, in case there are any errors in the files that should be synced.
+
 ## Potential use cases
 
 Sync files that must be present and unchanged in all tracks, e.g.
