@@ -1,0 +1,195 @@
+name: Sync
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+env:
+  BOT_USERNAME: 'exercism-bot'
+  GIT_USERNAME: 'Exercism Bot'
+  GIT_EMAIL: '66069679+exercism-bot@users.noreply.github.com'
+
+jobs:
+  fetch-tracks:
+    name: Fetch & fork tracks
+    runs-on: ubuntu-20.04
+
+    outputs:
+      tracks: ${{ steps.fetch-tracks.outputs.result }}
+
+    steps:
+    - name: Fetch list of tracks
+      id: fetch-tracks
+      uses: actions/github-script@47f7cf65b5ced0830a325f705cad64f2f58dddf7
+      with:
+        script: |
+          const trackRepos = await github.paginate(github.search.repos, {
+            q: 'org:exercism+topic:exercism-track'
+          })
+
+          // research_experiment_1 is not a real track, don't treat it as one
+          //return trackRepos.flatMap(({ full_name }) => full_name === 'exercism/research_experiment_1' ? [] : [full_name])
+
+          // TODO: Before merge, remove this and uncomment the line above
+          return ['exercism/julia']
+    
+    - name: Determine tracks needing to be forked
+      id: required-forks
+      uses: actions/github-script@47f7cf65b5ced0830a325f705cad64f2f58dddf7
+      with:
+        github-token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
+        script: |
+          const botRepos = await github.paginate(github.repos.listForAuthenticatedUser, {
+            affiliation: 'owner'
+          })
+
+          // Replacing the bot username with exercism is slightly hacky, but necessary
+          // for the comparison below. Unfortunately, GitHub's API response does not seem
+          // to contain any reference to the upstream repo of the fork.
+          const botForks = botRepos.flatMap(({ full_name, fork }) => fork ? [full_name.replace(process.env.BOT_USERNAME, 'exercism')] : [])
+
+          const tracks = ${{ steps.fetch-tracks.outputs.result }}
+
+          return tracks.filter(track => !botForks.includes(track))
+    
+    - name: Fork repos that haven't been forked yet
+      if: steps.required-forks.outputs.result != '[]'
+      uses: actions/github-script@47f7cf65b5ced0830a325f705cad64f2f58dddf7
+      with:
+        github-token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
+        script: |
+          const trackReposFullNames = ${{ steps.required-forks.outputs.result }}
+          const trackRepos = trackReposFullNames.map((fullName) => fullName.split('/')[1])
+
+          for (repo of trackRepos) {
+            await github.repos.createFork({
+              owner: 'exercism',
+              repo
+            })
+
+            // Sleep a bit to avoid rate-limiting
+            await new Promise(x => setTimeout(x, 2000))
+          }
+
+          // Forking repos happens asynchronously on GitHub, therefore
+          // we need to sleep a bit to ensure it has been created
+          await new Promise(x => setTimeout(x, 60000))
+
+  abort-timer:
+    needs: fetch-tracks
+    runs-on: ubuntu-20.04
+    name: ⚠ 5 MINUTES TO ABORT
+    environment: abort-timer
+    steps:
+      - run: exit 0
+
+  push-to-tracks:
+    needs: [fetch-tracks, abort-timer]
+    name: Push to ${{ matrix.track }}
+    runs-on: ubuntu-20.04
+    timeout-minutes: 30
+
+    # Launch one job per track.
+    # This is probably less efficient than running everything in one job
+    # and manually cloning and checking out the repos. However, launching a job
+    # lets us use actions like actions/checkout.
+    # It also gives us a pretty job overview that makes it easy to spot issues with
+    # particular tracks.
+    strategy:
+      fail-fast: false
+      matrix:
+        track: ${{ fromJson(needs.fetch-tracks.outputs.tracks) }}
+    
+    steps:
+    - name: Checkout main repo
+      uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f
+      with:
+        path: main
+
+    - name: Checkout track repo
+      uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f
+      with:
+        repository: ${{ matrix.track }}
+        token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
+        path: track-repo
+    
+    - name: Checkout new branch on track repo
+      id: branch
+      run: |
+        cd track-repo
+
+        # github.run_number is a unique ID for each workflow run in a repo
+        # WARNING: the run_number will NOT be updated if a workflow is re-run
+        branch="🤖/org-wide-files/${{ github.run_number }}"
+        git checkout -b "$branch"
+
+        echo "::set-output name=name::$branch"
+
+    - name: Copy synced files to track repo
+      run: |
+        cp -a main/synced-files/. track-repo/
+    
+    - name: Check for changes
+      id: changes
+      run: |
+        cd track-repo
+
+        if [ -z "$(git status --porcelain)" ]; then
+          echo "No files have changed."
+          exit 0
+        fi
+
+        echo "::set-output name=changes::true"
+
+    ########################################################
+    # ONLY RUN THE REST OF THE SCRIPT IF THERE ARE CHANGES #
+    # All following steps must have:                       #
+    #   if: steps.changes.outputs.changes == 'true'        #
+    ########################################################
+    
+    - name: Configure the git user
+      if: steps.changes.outputs.changes == 'true'
+      run: |
+        git config --global user.email "$GIT_EMAIL"
+        git config --global user.name "$GIT_USERNAME"
+
+    - name: Commit and push changes
+      if: steps.changes.outputs.changes == 'true'
+      env:
+        TRACK_REPO_FULLNAME: ${{ matrix.track }}
+        BOT_PERSONAL_ACCESS_TOKEN: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
+      run: |
+        cd track-repo
+
+        git add .
+
+        # The commit message assumes that one push maps to exactly one commit
+        # If a push contains several commits, the commit message will only link to the last one
+        git commit -m "🤖 Sync org-wide files to upstream repo" -m "PLEASE IGNORE THIS PR! IT'S JUST FOR TESTING." -m "More info: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/commit/$GITHUB_SHA"
+
+        # Push commit
+        track_repo="${TRACK_REPO_FULLNAME/exercism/$BOT_USERNAME}"
+        git push "$GITHUB_SERVER_URL/$track_repo.git"
+
+    - name: Open pull request on track repo
+      if: steps.changes.outputs.changes == 'true'
+      uses: actions/github-script@47f7cf65b5ced0830a325f705cad64f2f58dddf7
+      env:
+        TRACK_REPO_FULLNAME: ${{ matrix.track }}
+        BRANCH_NAME: ${{ steps.branch.outputs.name }}
+      with:
+        github-token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
+        script: |
+          const repo = process.env.TRACK_REPO_FULLNAME.split('/')[1]
+
+          github.pulls.create({
+            owner: 'exercism',
+            repo,
+            title: '🤖 Sync org-wide files to upstream repo',
+            head: `exercism-bot:${process.env.BRANCH_NAME}`,
+            base: 'main',
+            body: `More info: ${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/commit/${process.env.GITHUB_SHA}`,
+            maintainer_can_modify: false
+          })
