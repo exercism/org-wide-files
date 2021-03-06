@@ -5,7 +5,7 @@ on:
   push:
     branches:
       - main
-      - append-toml
+      - append-toml # TODO REMOVE ME
 
 env:
   BOT_USERNAME: "exercism-bot"
@@ -78,13 +78,13 @@ jobs:
             // we need to sleep a bit to ensure it has been created
             await new Promise(x => setTimeout(x, 60000))
 
-  # abort-timer:
-  #   needs: fetch-tracks
-  #   runs-on: ubuntu-20.04
-  #   name: ⚠ 5 MINUTES TO ABORT
-  #   environment: abort-timer
-  #   steps:
-  #     - run: exit 0
+  abort-timer:
+    needs: fetch-tracks
+    runs-on: ubuntu-20.04
+    name: ⚠ 5 MINUTES TO ABORT
+    # environment: abort-timer
+    steps:
+      - run: exit 0
 
   push-to-tracks:
     needs: [fetch-tracks, abort-timer]
