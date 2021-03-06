@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - append-toml # TODO REMOVE ME
 
 env:
   BOT_USERNAME: "exercism-bot"
@@ -77,13 +78,13 @@ jobs:
             // we need to sleep a bit to ensure it has been created
             await new Promise(x => setTimeout(x, 60000))
 
-  abort-timer:
-    needs: fetch-tracks
-    runs-on: ubuntu-20.04
-    name: ⚠ 5 MINUTES TO ABORT
-    environment: abort-timer
-    steps:
-      - run: exit 0
+  # abort-timer:
+  #   needs: fetch-tracks
+  #   runs-on: ubuntu-20.04
+  #   name: ⚠ 5 MINUTES TO ABORT
+  #   environment: abort-timer
+  #   steps:
+  #     - run: exit 0
 
   push-to-tracks:
     needs: [fetch-tracks, abort-timer]
@@ -130,6 +131,36 @@ jobs:
       - name: Copy synced files to track repo
         run: |
           cp -a main/synced-files/. track-repo/
+
+      - name: Apply transformations based on track config
+        shell: julia --color=yes {0}
+        env:
+          TRACK: ${{ matrix.track }}
+        run: |
+          using TOML
+
+          cd("track-repo")
+
+          # Check for existance of config file
+          cfgfile = joinpath(".github", "exercism-global-files.toml")
+          isfile(cfgfile) || (@info "$(ENV["TRACK"]) does not have an exercism-global-files.toml"; continue)
+
+          # Parse config file
+          cfg = TOML.parsefile(cfgfile)
+
+          # Iterate through files listed in config file and apply transformations
+          for (k, v) in cfg
+            # Append-only files
+            if v["type"] == "append"
+              open(k, "a") do f
+                # Add header
+                write(f, "\n## Annex\n\n")
+                write(f, v["annex"])
+              end
+
+              @info "Added annex to to $k:\n$(v["annex"])"
+            end
+          end
 
       - name: Check for changes
         id: changes
