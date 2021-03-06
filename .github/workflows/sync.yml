@@ -29,8 +29,7 @@ jobs:
               q: 'org:exercism+topic:exercism-track'
             })
 
-            // research_experiment_1 is not a real track, don't treat it as one
-            //return trackRepos.flatMap(({ full_name }) => full_name === 'exercism/research_experiment_1' ? [] : [full_name])
+            //return trackRepos.flatMap(({ full_name }) => [full_name])
 
             // TODO: Before merge, remove this and uncomment the line above
             return ['exercism/julia']
