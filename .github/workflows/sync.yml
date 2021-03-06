@@ -5,7 +5,7 @@ on:
   push:
     branches:
       - main
-      - append-toml # TODO REMOVE ME
+      - append-toml
 
 env:
   BOT_USERNAME: "exercism-bot"
