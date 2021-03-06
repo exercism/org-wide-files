@@ -148,7 +148,7 @@ jobs:
 
           # Check for existance of config file
           cfgfile = joinpath(".github", "exercism-global-files.toml")
-          isfile(cfgfile) || (@info "$(ENV["TRACK"]) does not have an exercism-global-files.toml"; continue)
+          isfile(cfgfile) || (@info "$(ENV["TRACK"]) does not have an exercism-global-files.toml"; exit(0))
 
           # Parse config file
           cfg = TOML.parsefile(cfgfile)
