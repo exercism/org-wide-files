@@ -12,6 +12,7 @@ After pushing, you have 5 minutes to abort the workflow, in case there are any e
 Sync files that must be present and unchanged in all tracks, e.g.
 
 - `CODE_OF_CONDUCT.md`
+- `LICENSE.md` with up-to-date year
 - Must-have workflows, e.g.
   - configlet
   - markdown linting
