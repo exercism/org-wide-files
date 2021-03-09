@@ -26,7 +26,7 @@ jobs:
         with:
           script: |
             const trackRepos = await github.paginate(github.search.repos, {
-              q: 'org:exercism+topic:exercism-track'
+              q: 'org:exercism+topic:exercism-track+is:public'
             })
 
             //return trackRepos.flatMap(({ full_name }) => [full_name])
@@ -47,6 +47,7 @@ jobs:
             // Replacing the bot username with exercism is slightly hacky, but necessary
             // for the comparison below. Unfortunately, GitHub's API response does not seem
             // to contain any reference to the upstream repo of the fork.
+            // TODO: The GraphQL API does have this info. Look into changing to that.
             const botForks = botRepos.flatMap(({ full_name, fork }) => fork ? [full_name.replace(process.env.BOT_USERNAME, 'exercism')] : [])
 
             const tracks = ${{ steps.fetch-tracks.outputs.result }}
@@ -62,7 +63,7 @@ jobs:
             const trackReposFullNames = ${{ steps.required-forks.outputs.result }}
             const trackRepos = trackReposFullNames.map((fullName) => fullName.split('/')[1])
 
-            for (repo of trackRepos) {
+            for (let repo of trackRepos) {
               await github.repos.createFork({
                 owner: 'exercism',
                 repo
@@ -166,6 +167,7 @@ jobs:
 
           # The commit message assumes that one push maps to exactly one commit
           # If a push contains several commits, the commit message will only link to the last one
+          # TODO: Remove ignore-me comment
           git commit -m "🤖 Sync org-wide files to upstream repo" -m "PLEASE IGNORE THIS PR! IT'S JUST FOR TESTING." -m "More info: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/commit/$GITHUB_SHA"
 
           # Push commit
