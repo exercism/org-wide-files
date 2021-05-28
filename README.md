@@ -23,3 +23,4 @@ Sync files that must be present and unchanged in all tracks, e.g.
 - Allow edits from maintainers for certain files or apply track-specific automated transformations instead of merely copying all files.
 - Add support to rerun workflow for specific tracks only via `workflow_dispatch`.
 - Add CI check that each file in `synced_files/` is part of `synced_files/.github/CODEOWNERS`.
+- Add repository dispatches so that changes to append files trigger re-runs of the workflow for the given track.
