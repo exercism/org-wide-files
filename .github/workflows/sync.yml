@@ -132,11 +132,6 @@ jobs:
         run: |
           cp -a main/synced-files/. track-repo/
 
-      - name: Install Julia 1.6 # TODO: Remove this once 1.6 is on GHA runners. We need the TOML stdlib, which was added in 1.6
-        uses: julia-actions/setup-julia@0b9b1d2cd24245f151902702d8e73b3f6b910014
-        with:
-          version: "~1.6.0-0"
-
       - name: Apply transformations based on track config
         shell: julia --color=yes {0}
         env:
