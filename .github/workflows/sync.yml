@@ -6,6 +6,9 @@ on:
     branches:
       - main
       - append-toml # TODO REMOVE ME
+    paths-ignore:
+      - README.md
+      - LICENSE
 
 env:
   BOT_USERNAME: "exercism-bot"
