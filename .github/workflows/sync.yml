@@ -119,8 +119,15 @@ jobs:
 
       - name: Checkout new branch on track repo
         id: branch
+        env:
+          TRACK: ${{ matrix.track }}
         run: |
           cd track-repo
+
+          # Update main to upstream track repo
+          git remote add upstream "https://github.com/exercism/$TRACK.git"
+          git pull upstream
+          git push origin
 
           # github.run_number is a unique ID for each workflow run in a repo
           # WARNING: the run_number will NOT be updated if a workflow is re-run
@@ -202,9 +209,6 @@ jobs:
           # If a push contains several commits, the commit message will only link to the last one
           # TODO: Remove ignore-me comment
           git commit -m "🤖 Sync org-wide files to upstream repo" -m "PLEASE IGNORE THIS PR! IT'S JUST FOR TESTING." -m "More info: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/commit/$GITHUB_SHA"
-
-          # TODO Remove this
-          git diff main..
 
           # Push commit
           track_repo="${TRACK_REPO_FULLNAME/exercism/$BOT_USERNAME}"
