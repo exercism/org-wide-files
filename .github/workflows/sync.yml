@@ -128,7 +128,7 @@ jobs:
           cd track-repo
 
           # Update main to upstream track repo
-          git remote add upstream "https://github.com/exercism/$TRACK.git"
+          git remote add upstream "https://github.com/$TRACK.git"
           git pull upstream
           git push origin
 
