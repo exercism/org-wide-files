@@ -202,6 +202,9 @@ jobs:
         run: |
           cd track-repo
 
+          # Show diff for debugging
+          git diff
+
           git add .
 
           # The commit message assumes that one push maps to exactly one commit
