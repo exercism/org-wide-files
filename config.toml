@@ -1,2 +1,4 @@
-["CODE_OF_CONDUCT.md"]
-allowed_keys = "append"
+# List of files that can be appended in the track repos
+appendable_files = [
+    "CODE_OF_CONDUCT.md"
+]
