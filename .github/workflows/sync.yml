@@ -129,8 +129,8 @@ jobs:
 
           # Update main to upstream track repo
           git remote add upstream "https://github.com/$TRACK.git"
-          git pull upstream
-          git push origin
+          git pull upstream main
+          git push origin main
 
           # github.run_number is a unique ID for each workflow run in a repo
           # WARNING: the run_number will NOT be updated if a workflow is re-run
