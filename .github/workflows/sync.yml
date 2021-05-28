@@ -115,6 +115,7 @@ jobs:
           repository: ${{ matrix.track }}
           token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
           path: track-repo
+          fetch-depth: 0
 
       - name: Checkout new branch on track repo
         id: branch
