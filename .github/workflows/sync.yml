@@ -205,8 +205,7 @@ jobs:
 
           # The commit message assumes that one push maps to exactly one commit
           # If a push contains several commits, the commit message will only link to the last one
-          # TODO: Remove ignore-me comment
-          git commit -m "🤖 Sync org-wide files to upstream repo" -m "PLEASE IGNORE THIS PR! IT'S JUST FOR TESTING." -m "More info: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/commit/$GITHUB_SHA"
+          git commit -m "🤖 Sync org-wide files to upstream repo" -m "More info: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/commit/$GITHUB_SHA"
 
           # Push commit
           track_repo="${TRACK_REPO_FULLNAME/exercism/$BOT_USERNAME}"
