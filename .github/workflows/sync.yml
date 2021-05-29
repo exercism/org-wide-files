@@ -2,12 +2,16 @@ name: Sync
 
 on:
   workflow_dispatch:
+    inputs:
+      tracks:
+        description: 'List of tracks to rerun the syncing workflow for, formatted as JSON array, e.g. ["exercism/julia"]'
+        required: true
+        default: ''
   repository_dispatch:
     types: [track_changes]
   push:
     branches:
       - main
-      - append-toml # TODO REMOVE ME
     paths-ignore:
       - README.md
       - LICENSE
@@ -33,6 +37,8 @@ jobs:
           script: |
             if (context.eventName === 'repository_dispatch') {
               return context.payload.client_payload.tracks
+            } else if (context.eventName === 'workflow_dispatch') {
+              return JSON.parse(context.payload.inputs.tracks)
             } else {
               const trackRepos = await github.paginate(github.search.repos, {
                 q: 'org:exercism+topic:exercism-track+is:public'
