@@ -44,10 +44,7 @@ jobs:
                 q: 'org:exercism+topic:exercism-track+is:public'
               })
 
-              //return trackRepos.flatMap(({ full_name }) => [full_name])
-
-              // TODO: Before merge, remove this and uncomment the line above
-              return ['exercism/julia']
+              return trackRepos.flatMap(({ full_name }) => [full_name])
             }
 
       - name: Determine tracks needing to be forked
