@@ -2,6 +2,8 @@ name: Sync
 
 on:
   workflow_dispatch:
+  repository_dispatch:
+    types: [track_changes]
   push:
     branches:
       - main
@@ -29,14 +31,18 @@ jobs:
         uses: actions/github-script@47f7cf65b5ced0830a325f705cad64f2f58dddf7
         with:
           script: |
-            const trackRepos = await github.paginate(github.search.repos, {
-              q: 'org:exercism+topic:exercism-track+is:public'
-            })
+            if (context.event_name === 'repository_dispatch') {
+              return context.event.client_payload.tracks
+            } else {
+              const trackRepos = await github.paginate(github.search.repos, {
+                q: 'org:exercism+topic:exercism-track+is:public'
+              })
 
-            //return trackRepos.flatMap(({ full_name }) => [full_name])
+              //return trackRepos.flatMap(({ full_name }) => [full_name])
 
-            // TODO: Before merge, remove this and uncomment the line above
-            return ['exercism/julia']
+              // TODO: Before merge, remove this and uncomment the line above
+              return ['exercism/julia']
+            }
 
       - name: Determine tracks needing to be forked
         id: required-forks
@@ -85,7 +91,7 @@ jobs:
     needs: fetch-tracks
     runs-on: ubuntu-20.04
     name: ⚠ 5 MINUTES TO ABORT
-    # environment: abort-timer
+    environment: abort-timer
     steps:
       - run: exit 0
 
