@@ -32,7 +32,7 @@ jobs:
         with:
           script: |
             if (context.eventName === 'repository_dispatch') {
-              return context.event.client_payload.tracks
+              return context.payload.client_payload.tracks
             } else {
               const trackRepos = await github.paginate(github.search.repos, {
                 q: 'org:exercism+topic:exercism-track+is:public'
