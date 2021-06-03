@@ -158,7 +158,7 @@ jobs:
                 repo: process.env.TRACK_REPO_FULLNAME.split('/')[1]
               })
 
-            return repoTopics.names.includes('exercism-track')
+            return repoTopics[0].names.includes('exercism-track')
 
       - name: Copy globally synced files to target repo
         run: |
