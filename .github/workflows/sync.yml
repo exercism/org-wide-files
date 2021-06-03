@@ -40,7 +40,7 @@ jobs:
             } else if (context.eventName === 'workflow_dispatch') {
               return JSON.parse(context.payload.inputs.tracks)
             } else {
-              const trackRepos = await github.paginate(github.rest.listForOrg, {
+              const trackRepos = await github.paginate(github.listForOrg, {
                 org: 'exercism',
                 type: 'public'
               })
@@ -151,7 +151,7 @@ jobs:
         with:
           github-token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
           script: |
-            const repoTopics = await github.paginate(github.rest.repos.getAllTopics, {
+            const repoTopics = await github.paginate(github.repos.getAllTopics, {
                 owner: context.payload.repository.owner.name,
                 repo: context.payload.repository.name
               })
