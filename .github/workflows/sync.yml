@@ -156,6 +156,8 @@ jobs:
                 repo: context.repo.repo
               })
             
+            console.log(repoTopics)
+
             return repoTopics.includes('exercism-track')
 
       - name: Copy globally synced files to target repo
@@ -163,7 +165,7 @@ jobs:
           cp -a main/global-files/. track-repo/
 
       - name: Copy tracks-only synced files to target repo
-        if: steps.is-track-repo.outputs.result
+        if: steps.is-track-repo.outputs.result == 'true'
         run: |
           cp -a main/tracks-files/. track-repo/
 
