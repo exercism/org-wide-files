@@ -8,9 +8,9 @@
 # don't edit this file directly but instead create a `.appends/.github/labels.yml`
 # file within this repo.
 #
-# Any changes to the repo's `.appends/.github/labels.yml`
-# file or the Exercism-wide `labels.yml` file will automatically result in this
-# file being regenerated and the labels being updated.
+# Any changes to the repo's `.appends/.github/labels.yml` file or the 
+# Exercism-wide `labels.yml` file will automatically result in this file being 
+# regenerated and the labels being updated. This typically takes 5-10 minutes.
 
 # ---
 #
