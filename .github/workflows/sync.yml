@@ -23,14 +23,14 @@ env:
 
 jobs:
   fetch-tracks:
-    name: Fetch & fork tracks
+    name: Fetch & fork target repos
     runs-on: ubuntu-20.04
 
     outputs:
       tracks: ${{ steps.fetch-tracks.outputs.result }}
 
     steps:
-      - name: Fetch list of tracks
+      - name: Fetch list of target repos
         id: fetch-tracks
         uses: actions/github-script@a3e7071a34d7e1f219a8a4de9a5e0a34d1ee1293
         with:
@@ -40,14 +40,15 @@ jobs:
             } else if (context.eventName === 'workflow_dispatch') {
               return JSON.parse(context.payload.inputs.tracks)
             } else {
-              const trackRepos = await github.paginate(github.search.repos, {
-                q: 'org:exercism+topic:exercism-track+is:public'
+              const trackRepos = await github.paginate(github.rest.listForOrg, {
+                org: 'exercism',
+                type: 'public'
               })
 
               return trackRepos.flatMap(({ full_name }) => [full_name])
             }
 
-      - name: Determine tracks needing to be forked
+      - name: Determine target repos needing to be forked
         id: required-forks
         uses: actions/github-script@a3e7071a34d7e1f219a8a4de9a5e0a34d1ee1293
         with:
@@ -94,7 +95,7 @@ jobs:
     needs: fetch-tracks
     runs-on: ubuntu-20.04
     name: ⚠ 5 MINUTES TO ABORT
-    environment: abort-timer
+    # environment: abort-timer
     steps:
       - run: exit 0
 
@@ -122,7 +123,7 @@ jobs:
         with:
           path: main
 
-      - name: Checkout track repo
+      - name: Checkout target repo
         uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f
         with:
           repository: ${{ matrix.track }}
@@ -144,9 +145,27 @@ jobs:
 
           echo "::set-output name=name::$branch"
 
-      - name: Copy synced files to track repo
+      - name: Determine if repo is a track repo
+        id: is-track-repo
+        uses: actions/github-script@a3e7071a34d7e1f219a8a4de9a5e0a34d1ee1293
+        with:
+          github-token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
+          script: |
+            const repoTopics = await github.paginate(github.rest.repos.getAllTopics, {
+                owner: context.payload.repository.owner.name,
+                repo: context.payload.repository.name
+              })
+            
+            return repoTopics.includes('exercism-track')
+
+      - name: Copy globally synced files to target repo
         run: |
-          cp -a main/synced-files/. track-repo/
+          cp -a main/global-files/. track-repo/
+
+      - name: Copy tracks-only synced files to target repo
+        if: steps.is-track-repo.outputs.result
+        run: |
+          cp -a main/tracks-files/. track-repo/
 
       - name: Apply transformations based on track config
         shell: julia --color=yes {0}
