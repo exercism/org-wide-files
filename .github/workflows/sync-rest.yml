@@ -7,8 +7,8 @@ on:
         description: 'List of tracks to rerun the syncing workflow for, formatted as JSON array, e.g. ["exercism/julia"]'
         required: true
         default: ""
-  repository_dispatch:
-    types: [track_changes]
+  # repository_dispatch:
+  #   types: [track_changes]
   push:
     branches:
       - main
