@@ -89,155 +89,155 @@ jobs:
             // we need to sleep a bit to ensure it has been created
             await new Promise(x => setTimeout(x, 60000))
 
-  # abort-timer:
-  #   needs: fetch-tracks
-  #   runs-on: ubuntu-20.04
-  #   name: ⚠ 5 MINUTES TO ABORT
-  #   environment: abort-timer
-  #   steps:
-  #     - run: exit 0
+  abort-timer:
+    needs: fetch-tracks
+    runs-on: ubuntu-20.04
+    name: ⚠ 5 MINUTES TO ABORT
+    environment: abort-timer
+    steps:
+      - run: exit 0
 
-  # push-to-tracks:
-  #   needs: [fetch-tracks, abort-timer]
-  #   name: Push to ${{ matrix.track }}
-  #   runs-on: ubuntu-20.04
-  #   timeout-minutes: 30
+  push-to-tracks:
+    needs: [fetch-tracks, abort-timer]
+    name: Push to ${{ matrix.track }}
+    runs-on: ubuntu-20.04
+    timeout-minutes: 30
 
-  #   # Launch one job per track.
-  #   # This is probably less efficient than running everything in one job
-  #   # and manually cloning and checking out the repos. However, launching a job
-  #   # lets us use actions like actions/checkout.
-  #   # It also gives us a pretty job overview that makes it easy to spot issues with
-  #   # particular tracks.
-  #   strategy:
-  #     fail-fast: false
-  #     max-parallel: 5
-  #     matrix:
-  #       track: ${{ fromJson(needs.fetch-tracks.outputs.tracks) }}
+    # Launch one job per track.
+    # This is probably less efficient than running everything in one job
+    # and manually cloning and checking out the repos. However, launching a job
+    # lets us use actions like actions/checkout.
+    # It also gives us a pretty job overview that makes it easy to spot issues with
+    # particular tracks.
+    strategy:
+      fail-fast: false
+      max-parallel: 5
+      matrix:
+        track: ${{ fromJson(needs.fetch-tracks.outputs.tracks) }}
 
-  #   steps:
-  #     - name: Checkout main repo
-  #       uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f
-  #       with:
-  #         path: main
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f
+        with:
+          path: main
 
-  #     - name: Checkout target repo
-  #       uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f
-  #       with:
-  #         repository: ${{ matrix.track }}
-  #         token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
-  #         path: track-repo
-  #         fetch-depth: 0
+      - name: Checkout target repo
+        uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f
+        with:
+          repository: ${{ matrix.track }}
+          token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
+          path: track-repo
+          fetch-depth: 0
 
-  #     - name: Checkout new branch on track repo
-  #       id: branch
-  #       env:
-  #         TRACK: ${{ matrix.track }}
-  #       run: |
-  #         cd track-repo
+      - name: Checkout new branch on track repo
+        id: branch
+        env:
+          TRACK: ${{ matrix.track }}
+        run: |
+          cd track-repo
 
-  #         # github.run_number is a unique ID for each workflow run in a repo
-  #         # WARNING: the run_number will NOT be updated if a workflow is re-run
-  #         branch="🤖/org-wide-files/${{ github.run_number }}"
-  #         git checkout -b "$branch"
+          # github.run_number is a unique ID for each workflow run in a repo
+          # WARNING: the run_number will NOT be updated if a workflow is re-run
+          branch="🤖/org-wide-files/${{ github.run_number }}"
+          git checkout -b "$branch"
 
-  #         echo "::set-output name=name::$branch"
+          echo "::set-output name=name::$branch"
 
-  #     - name: Copy synced files to target repo
-  #       run: |
-  #         cp -a main/global-files/. track-repo/
-  #         cp -a main/tracks-files/. track-repo/
+      - name: Copy synced files to target repo
+        run: |
+          cp -a main/global-files/. track-repo/
+          cp -a main/tracks-files/. track-repo/
 
-  #     - name: Apply transformations based on track config
-  #       shell: julia --color=yes {0}
-  #       env:
-  #         TRACK: ${{ matrix.track }}
-  #       run: |
-  #         using TOML
+      - name: Apply transformations based on track config
+        shell: julia --color=yes {0}
+        env:
+          TRACK: ${{ matrix.track }}
+        run: |
+          using TOML
 
-  #         # Parse config files
-  #         global_cfg = TOML.parsefile(joinpath("main", "config.toml"))
+          # Parse config files
+          global_cfg = TOML.parsefile(joinpath("main", "config.toml"))
 
-  #         # Iterate through files listed in global config file
-  #         for file in global_cfg["appendable_files"]
-  #           append_path = joinpath("track-repo", ".appends", file)
+          # Iterate through files listed in global config file
+          for file in global_cfg["appendable_files"]
+            append_path = joinpath("track-repo", ".appends", file)
 
-  #           # Check for existance of append file
-  #           isfile(append_path) || (@info "$(ENV["TRACK"]) does not have an append for $file"; exit(0))
+            # Check for existance of append file
+            isfile(append_path) || (@info "$(ENV["TRACK"]) does not have an append for $file"; exit(0))
 
-  #           # Read content of append file
-  #           append_content = read(append_path, String)
+            # Read content of append file
+            append_content = read(append_path, String)
 
-  #           # Append file
-  #           open(joinpath("track-repo", file), "a") do io
-  #             write(io, append_content)
+            # Append file
+            open(joinpath("track-repo", file), "a") do io
+              write(io, append_content)
 
-  #             @info "Appended $file" append_content
-  #           end
-  #         end
+              @info "Appended $file" append_content
+            end
+          end
 
-  #     - name: Check for changes
-  #       id: changes
-  #       run: |
-  #         cd track-repo
+      - name: Check for changes
+        id: changes
+        run: |
+          cd track-repo
 
-  #         if [ -z "$(git status --porcelain)" ]; then
-  #           echo "No files have changed."
-  #           exit 0
-  #         fi
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "No files have changed."
+            exit 0
+          fi
 
-  #         echo "::set-output name=changes::true"
+          echo "::set-output name=changes::true"
 
-  #     ########################################################
-  #     # ONLY RUN THE REST OF THE SCRIPT IF THERE ARE CHANGES #
-  #     # All following steps must have:                       #
-  #     #   if: steps.changes.outputs.changes == 'true'        #
-  #     ########################################################
+      ########################################################
+      # ONLY RUN THE REST OF THE SCRIPT IF THERE ARE CHANGES #
+      # All following steps must have:                       #
+      #   if: steps.changes.outputs.changes == 'true'        #
+      ########################################################
 
-  #     - name: Configure the git user
-  #       if: steps.changes.outputs.changes == 'true'
-  #       run: |
-  #         git config --global user.email "$GIT_EMAIL"
-  #         git config --global user.name "$GIT_USERNAME"
+      - name: Configure the git user
+        if: steps.changes.outputs.changes == 'true'
+        run: |
+          git config --global user.email "$GIT_EMAIL"
+          git config --global user.name "$GIT_USERNAME"
 
-  #     - name: Commit and push changes
-  #       if: steps.changes.outputs.changes == 'true'
-  #       env:
-  #         TRACK_REPO_FULLNAME: ${{ matrix.track }}
-  #         BOT_PERSONAL_ACCESS_TOKEN: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
-  #       run: |
-  #         cd track-repo
+      - name: Commit and push changes
+        if: steps.changes.outputs.changes == 'true'
+        env:
+          TRACK_REPO_FULLNAME: ${{ matrix.track }}
+          BOT_PERSONAL_ACCESS_TOKEN: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
+        run: |
+          cd track-repo
 
-  #         # Show diff for debugging
-  #         git diff
+          # Show diff for debugging
+          git diff
 
-  #         git add .
+          git add .
 
-  #         # The commit message assumes that one push maps to exactly one commit
-  #         # If a push contains several commits, the commit message will only link to the last one
-  #         git commit -m "🤖 Sync org-wide files to upstream repo" -m "More info: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/commit/$GITHUB_SHA"
+          # The commit message assumes that one push maps to exactly one commit
+          # If a push contains several commits, the commit message will only link to the last one
+          git commit -m "🤖 Sync org-wide files to upstream repo" -m "More info: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/commit/$GITHUB_SHA"
 
-  #         # Push commit
-  #         track_repo="${TRACK_REPO_FULLNAME/exercism/$BOT_USERNAME}"
-  #         git push "$GITHUB_SERVER_URL/$track_repo.git"
+          # Push commit
+          track_repo="${TRACK_REPO_FULLNAME/exercism/$BOT_USERNAME}"
+          git push "$GITHUB_SERVER_URL/$track_repo.git"
 
-  #     - name: Open pull request on track repo
-  #       if: steps.changes.outputs.changes == 'true'
-  #       uses: actions/github-script@a3e7071a34d7e1f219a8a4de9a5e0a34d1ee1293
-  #       env:
-  #         TRACK_REPO_FULLNAME: ${{ matrix.track }}
-  #         BRANCH_NAME: ${{ steps.branch.outputs.name }}
-  #       with:
-  #         github-token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
-  #         script: |
-  #           const repo = process.env.TRACK_REPO_FULLNAME.split('/')[1]
+      - name: Open pull request on track repo
+        if: steps.changes.outputs.changes == 'true'
+        uses: actions/github-script@a3e7071a34d7e1f219a8a4de9a5e0a34d1ee1293
+        env:
+          TRACK_REPO_FULLNAME: ${{ matrix.track }}
+          BRANCH_NAME: ${{ steps.branch.outputs.name }}
+        with:
+          github-token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
+          script: |
+            const repo = process.env.TRACK_REPO_FULLNAME.split('/')[1]
 
-  #           github.pulls.create({
-  #             owner: 'exercism',
-  #             repo,
-  #             title: '🤖 Sync org-wide files to upstream repo',
-  #             head: `exercism-bot:${process.env.BRANCH_NAME}`,
-  #             base: 'main',
-  #             body: `More info: ${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/commit/${process.env.GITHUB_SHA}`,
-  #             maintainer_can_modify: false
-  #           })
+            github.pulls.create({
+              owner: 'exercism',
+              repo,
+              title: '🤖 Sync org-wide files to upstream repo',
+              head: `exercism-bot:${process.env.BRANCH_NAME}`,
+              base: 'main',
+              body: `More info: ${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/commit/${process.env.GITHUB_SHA}`,
+              maintainer_can_modify: false
+            })
