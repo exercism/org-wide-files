@@ -119,9 +119,6 @@ jobs:
     # lets us use actions like actions/checkout.
     # It also gives us a pretty job overview that makes it easy to spot issues with
     # particular tracks.
-    # This approach will stop working once there are >256 repos in the Exercism org.
-    # That's still far away, but once that happens, we can split up the workflow in several workflows,
-    # e.g. one for tracks, one for other repos.
     strategy:
       fail-fast: false
       max-parallel: 5
