@@ -1,4 +1,5 @@
 # List of files that can be appended in the target repos
 appendable_files = [
-    "CODE_OF_CONDUCT.md"
+    "CODE_OF_CONDUCT.md",
+    ".github/labels.yml",
 ]
