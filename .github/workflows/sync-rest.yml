@@ -41,18 +41,17 @@ jobs:
             } else if (context.eventName === 'workflow_dispatch') {
               return JSON.parse(context.payload.inputs.tracks)
             } else {
-              const allRepos = await github.paginate(github.listForOrg, {
-                org: 'exercism',
-                type: 'public'
-              }).flatMap(({ full_name }) => [full_name])
+              const allRepos = (await github.paginate(github.search.repos, {
+                q: 'org:exercism+is:public'
+              })).flatMap(({ full_name }) => [full_name])
 
-              const toolingRepos = await github.paginate(github.search.repos, {
+              const toolingRepos = (await github.paginate(github.search.repos, {
                 q: 'org:exercism+topic:exercism-tooling+is:public'
-              }).flatMap(({ full_name }) => [full_name])
+              })).flatMap(({ full_name }) => [full_name])
 
-              const trackRepos = await github.paginate(github.search.repos, {
+              const trackRepos = (await github.paginate(github.search.repos, {
                 q: 'org:exercism+topic:exercism-track+is:public'
-              }).flatMap(({ full_name }) => [full_name])
+              })).flatMap(({ full_name }) => [full_name])
 
               return allRepos.filter(r => !toolingRepos.includes(r) && !trackRepos.includes(r))
             }
