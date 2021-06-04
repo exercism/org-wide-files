@@ -10,7 +10,6 @@ on:
   push:
     branches:
       - main
-      - global-and-track-files # TODO: remove
     paths-ignore:
       - README.md
       - LICENSE
