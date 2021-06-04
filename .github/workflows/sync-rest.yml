@@ -42,15 +42,15 @@ jobs:
               return JSON.parse(context.payload.inputs.tracks)
             } else {
               const allRepos = (await github.paginate(github.search.repos, {
-                q: 'org:exercism+is:public'
+                q: 'org:exercism+is:public+archived:false'
               })).flatMap(({ full_name }) => [full_name])
 
               const toolingRepos = (await github.paginate(github.search.repos, {
-                q: 'org:exercism+topic:exercism-tooling+is:public'
+                q: 'org:exercism+topic:exercism-tooling+is:public+archived:false'
               })).flatMap(({ full_name }) => [full_name])
 
               const trackRepos = (await github.paginate(github.search.repos, {
-                q: 'org:exercism+topic:exercism-track+is:public'
+                q: 'org:exercism+topic:exercism-track+is:public+archived:false'
               })).flatMap(({ full_name }) => [full_name])
 
               return allRepos.filter(r => !toolingRepos.includes(r) && !trackRepos.includes(r))
