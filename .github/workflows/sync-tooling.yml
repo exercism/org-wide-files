@@ -1,4 +1,4 @@
-name: Sync
+name: Sync Tooling
 
 on:
   workflow_dispatch:
