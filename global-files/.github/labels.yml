@@ -12,9 +12,9 @@
 # Exercism-wide `labels.yml` file will automatically result in this file being
 # regenerated and the labels being updated. This typically takes 5-10 minutes.
 
-# ---
-#
+# ---------------------------------------------------------------------
 # These are the Exercism-wide labels which are shared across all repos.
+# ---------------------------------------------------------------------
 #
 # The following Exercism-wide labels are used to show "tasks" on the website, which
 # will point users to things they can help contribute with.
