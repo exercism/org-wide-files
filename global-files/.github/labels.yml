@@ -19,7 +19,7 @@
 # The following Exercism-wide labels are used to show "tasks" on the website, which
 # will point users to things they can help contribute with.
 
-# The x:action labels describe what sort of work the contributor
+# The `x:action/<value>` labels describe what sort of work the contributor
 # will be engaged in when working on the issue
 - name: "x:action/create"
   description: "Work on something from scratch"
@@ -41,7 +41,7 @@
   description: "Sync content with its latest version"
   color: "6f60d2"
 
-# The x:knowledge labels describe how much Exercism knowledge
+# The `x:knowledge/<value>` labels describe how much Exercism knowledge
 # is required by the contributor
 - name: "x:knowledge/none"
   description: "No existing Exercism knowledge required"
@@ -59,7 +59,7 @@
   description: "Comprehensive Exercism knowledge required"
   color: "604fcd"
 
-# The x:models labels indicate what part of Exercism
+# The `x:module/<value>` labels indicate what part of Exercism
 # the contributor will be working on
 - name: "x:module/analyzer"
   description: "Work on Analyzers"
@@ -89,7 +89,7 @@
   description: "Work on Test Runners"
   color: "5240c9"
 
-# The x:size labels describe the expected amount of work
+# The `x:size/<value>` labels describe the expected amount of work
 # for a contributor
 - name: "x:size/tiny"
   description: "Tiny amount of work"
@@ -111,13 +111,13 @@
   description: "Massive amount of work"
   color: "4836bf"
 
-# The x:status label indicates if there is already someone
+# The `x:status/<value>` label indicates if there is already someone
 # working on the issue
 - name: "x:status/claimed"
   description: "Someone is working on this issue"
   color: "4231af"
 
-# The x:type labels describe how much Exercism knowledge
+# The `x:type/<value>` labels describe how much Exercism knowledge
 # is required by the contributor
 - name: "x:type/ci"
   description: "Work on Continuous Integration (e.g. GitHub Actions workflows)"
