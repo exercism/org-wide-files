@@ -7,7 +7,7 @@
 # 2. The repository-specific labels
 #
 # The Exercism-wide labels are defined in
-# https://github.com/exercism/org-wide-files/blob/main/synced-files/.github/labels.yml
+# https://github.com/exercism/org-wide-files/blob/main/global-files/.github/labels.yml
 #
 # The repository-specific labels are defined in `.appends/.github/labels.yml`.
 # If you want to change the repository-specific labels, update the
