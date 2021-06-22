@@ -116,8 +116,8 @@
   description: "Someone is working on this issue"
   color: "4231af"
 
-# The x:type labels describe how much Exercism knowledge
-# is required by the contributor
+# The x:type labels describe the type of work the contributor
+# will be engaged in
 - name: "x:type/ci"
   description: "Work on Continuous Integration (e.g. GitHub Actions workflows)"
   color: "3c2d9f"
