@@ -21,8 +21,8 @@
 # These are the Exercism-wide labels which are shared across all repos. #
 # --------------------------------------------------------------------- #
 
-# The following Exercism-wide labels are used to show "tasks" on the website, which
-# will point users to things they can help contribute with.
+# The following Exercism-wide labels are used to show "tasks" on the website,
+# which will point users to things they can help contribute with.
 
 # The `x:action/<value>` labels describe what sort of work the contributor
 # will be engaged in when working on the issue
@@ -129,7 +129,7 @@
   color: "3c2d9f"
 
 - name: "x:type/coding"
-  description: "Work on code that will run in production"
+  description: "Work on code that is not run by students"
   color: "3c2d9f"
 
 - name: "x:type/content"
