@@ -144,18 +144,6 @@
   description: "Work on Documentation"
   color: "3c2d9f"
 
-# The following Exercism-wide labels are used to influence how much reputation
-# a contributor gets for an authored/merged/reviewed PR.
-# See https://github.com/exercism/docs/blob/main/product/reputation.md
-
-- name: "reputation/contributed_code/major"
-  description: "Increases the number of reputation points awarded by this PR"
-  color: "fcfa9f"
-
-- name: "reputation/contributed_code/minor"
-  description: "Decreases the number of reputation points awarded by this PR"
-  color: "fcfa9f"
-
 # This Exercism-wide label is added to all automatically created pull requests
 # that help migrate/prepare a track for Exercism v3
 - name: "v3-migration 🤖"
