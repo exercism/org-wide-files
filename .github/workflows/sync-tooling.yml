@@ -110,7 +110,7 @@ jobs:
     # particular tracks.
     strategy:
       fail-fast: false
-      max-parallel: 5
+      max-parallel: 1
       matrix:
         track: ${{ fromJson(needs.fetch-tracks.outputs.tracks) }}
 
