@@ -191,7 +191,7 @@ jobs:
             append_path = joinpath("track-repo", ".appends", file)
 
             # Check for existance of append file
-            isfile(append_path) || (@info "$(ENV["TRACK"]) does not have an append for $file"; exit(0))
+            isfile(append_path) || (@info "$(ENV["TRACK"]) does not have an append for $file"; continue)
 
             # Read content of append file
             append_content = read(append_path, String)
