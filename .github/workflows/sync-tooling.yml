@@ -135,9 +135,9 @@ jobs:
         run: |
           cd track-repo
 
-          # github.run_number is a unique ID for each workflow run in a repo
-          # WARNING: the run_number will NOT be updated if a workflow is re-run
-          branch="🤖/org-wide-files/${{ github.run_number }}"
+          # github.run_id is a unique number for each run within a repository.
+          # WARNING: the run_id will NOT be updated if a workflow is re-run
+          branch="🤖/org-wide-files/${{ github.run_id }}"
           git checkout -b "$branch"
 
           echo "::set-output name=name::$branch"
