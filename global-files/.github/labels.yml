@@ -129,7 +129,7 @@
   color: "3c2d9f"
 
 - name: "x:type/coding"
-  description: "Work on code that is not run by students"
+  description: "Write code that is not student-facing content (e.g. test-runners, generators, but not exercises)"
   color: "3c2d9f"
 
 - name: "x:type/content"
