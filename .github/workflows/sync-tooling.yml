@@ -130,8 +130,6 @@ jobs:
 
       - name: Checkout new branch on track repo
         id: branch
-        env:
-          TRACK: ${{ matrix.track }}
         run: |
           cd track-repo
 
