@@ -214,8 +214,8 @@ jobs:
           git commit -m "🤖 Sync org-wide files to upstream repo" -m "More info: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/commit/$GITHUB_SHA"
 
           # Push commit
-          track_repo="${TARGET_REPO_FULLNAME/exercism/$BOT_USERNAME}"
-          git push "$GITHUB_SERVER_URL/$track_repo.git"
+          target_repo="${TARGET_REPO_FULLNAME/exercism/$BOT_USERNAME}"
+          git push "$GITHUB_SERVER_URL/$target_repo.git"
 
       - name: Open pull request on track repo
         if: steps.changes.outputs.changes == 'true'
