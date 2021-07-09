@@ -108,7 +108,7 @@ jobs:
 
   push-to-tracks:
     needs: [fetch-repos, abort-timer]
-    name: Push to ${{ matrix.track }}
+    name: Push to ${{ matrix.repo }}
     runs-on: ubuntu-20.04
     timeout-minutes: 30
 
@@ -122,7 +122,7 @@ jobs:
       fail-fast: false
       max-parallel: 1
       matrix:
-        track: ${{ fromJson(needs.fetch-repos.outputs.repos) }}
+        repo: ${{ fromJson(needs.fetch-repos.outputs.repos) }}
 
     steps:
       - name: Checkout main repo
@@ -133,7 +133,7 @@ jobs:
       - name: Checkout target repo
         uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f
         with:
-          repository: ${{ matrix.track }}
+          repository: ${{ matrix.repo }}
           token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
           path: track-repo
           fetch-depth: 0
@@ -154,7 +154,7 @@ jobs:
         id: is-track-repo
         uses: actions/github-script@a3e7071a34d7e1f219a8a4de9a5e0a34d1ee1293
         env:
-          TRACK_REPO_FULLNAME: ${{ matrix.track }}
+          TRACK_REPO_FULLNAME: ${{ matrix.repo }}
         with:
           github-token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
           script: |
@@ -177,7 +177,7 @@ jobs:
       - name: Apply transformations based on track config
         shell: julia --color=yes {0}
         env:
-          TRACK: ${{ matrix.track }}
+          TRACK: ${{ matrix.repo }}
         run: |
           using TOML
 
@@ -229,7 +229,7 @@ jobs:
       - name: Commit and push changes
         if: steps.changes.outputs.changes == 'true'
         env:
-          TRACK_REPO_FULLNAME: ${{ matrix.track }}
+          TRACK_REPO_FULLNAME: ${{ matrix.repo }}
           BOT_PERSONAL_ACCESS_TOKEN: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
         run: |
           cd track-repo
@@ -251,7 +251,7 @@ jobs:
         if: steps.changes.outputs.changes == 'true'
         uses: actions/github-script@a3e7071a34d7e1f219a8a4de9a5e0a34d1ee1293
         env:
-          TRACK_REPO_FULLNAME: ${{ matrix.track }}
+          TRACK_REPO_FULLNAME: ${{ matrix.repo }}
           BRANCH_NAME: ${{ steps.branch.outputs.name }}
         with:
           github-token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
