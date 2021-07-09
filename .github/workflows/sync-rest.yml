@@ -266,7 +266,7 @@ jobs:
 
           # The commit message assumes that one push maps to exactly one commit
           # If a push contains several commits, the commit message will only link to the last one
-          git commit -m "🤖 Sync org-wide files to upstream repo" -m "More info: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/commit/$GITHUB_SHA" -m "Tracking issue: $TRACKING_ISSUE_URL"
+          git commit -m "🤖 Sync org-wide files to upstream repo" -m "More info: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/commit/$GITHUB_SHA"
 
           # Push commit
           target_repo="${TARGET_REPO_FULLNAME/exercism/$BOT_USERNAME}"
