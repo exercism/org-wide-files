@@ -199,7 +199,7 @@ jobs:
       - name: Commit and push changes
         if: steps.changes.outputs.changes == 'true'
         env:
-          TRACK_REPO_FULLNAME: ${{ matrix.repo }}
+          TARGET_REPO_FULLNAME: ${{ matrix.repo }}
           BOT_PERSONAL_ACCESS_TOKEN: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
         run: |
           cd track-repo
@@ -214,19 +214,19 @@ jobs:
           git commit -m "🤖 Sync org-wide files to upstream repo" -m "More info: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/commit/$GITHUB_SHA"
 
           # Push commit
-          track_repo="${TRACK_REPO_FULLNAME/exercism/$BOT_USERNAME}"
+          track_repo="${TARGET_REPO_FULLNAME/exercism/$BOT_USERNAME}"
           git push "$GITHUB_SERVER_URL/$track_repo.git"
 
       - name: Open pull request on track repo
         if: steps.changes.outputs.changes == 'true'
         uses: actions/github-script@a3e7071a34d7e1f219a8a4de9a5e0a34d1ee1293
         env:
-          TRACK_REPO_FULLNAME: ${{ matrix.repo }}
+          TARGET_REPO_FULLNAME: ${{ matrix.repo }}
           BRANCH_NAME: ${{ steps.branch.outputs.name }}
         with:
           github-token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
           script: |
-            const repo = process.env.TRACK_REPO_FULLNAME.split('/')[1]
+            const repo = process.env.TARGET_REPO_FULLNAME.split('/')[1]
 
             github.pulls.create({
               owner: 'exercism',
