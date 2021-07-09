@@ -1,0 +1,6 @@
+# Code owners
+.github/CODEOWNERS @exercism/maintainers-admin
+
+# Synced files
+/global-files/ @exercism/maintainers-admin
+/tracks-files/ @exercism/maintainers-admin
