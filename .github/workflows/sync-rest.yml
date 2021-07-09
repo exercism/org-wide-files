@@ -290,6 +290,6 @@ jobs:
               title: '🤖 Sync org-wide files to upstream repo',
               head: `exercism-bot:${process.env.BRANCH_NAME}`,
               base: 'main',
-              body: `More info: ${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/commit/${process.env.GITHUB_SHA}\nTracking issue: ${process.env.TRACKING_ISSUE_URL}`,
+              body: `ℹ More info: ${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/commit/${process.env.GITHUB_SHA}\n👁 Tracking issue: ${process.env.TRACKING_ISSUE_URL}`,
               maintainer_can_modify: false
             })
