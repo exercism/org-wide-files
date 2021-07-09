@@ -22,16 +22,16 @@ env:
   GIT_EMAIL: "66069679+exercism-bot@users.noreply.github.com"
 
 jobs:
-  fetch-tracks:
+  fetch-repos:
     name: Fetch & fork target repos
     runs-on: ubuntu-20.04
 
     outputs:
-      tracks: ${{ steps.fetch-tracks.outputs.result }}
+      tracks: ${{ steps.fetch-repos.outputs.result }}
 
     steps:
       - name: Fetch list of target repos
-        id: fetch-tracks
+        id: fetch-repos
         uses: actions/github-script@a3e7071a34d7e1f219a8a4de9a5e0a34d1ee1293
         with:
           script: |
@@ -71,7 +71,7 @@ jobs:
             // TODO: The GraphQL API does have this info. Look into changing to that.
             const botForks = botRepos.flatMap(({ full_name, fork }) => fork ? [full_name.replace(process.env.BOT_USERNAME, 'exercism')] : [])
 
-            const tracks = ${{ steps.fetch-tracks.outputs.result }}
+            const tracks = ${{ steps.fetch-repos.outputs.result }}
 
             return tracks.filter(track => !botForks.includes(track))
 
@@ -99,7 +99,7 @@ jobs:
             await new Promise(x => setTimeout(x, 60000))
 
   abort-timer:
-    needs: fetch-tracks
+    needs: fetch-repos
     runs-on: ubuntu-20.04
     name: ⚠ 5 MINUTES TO ABORT
     environment: abort-timer
@@ -107,7 +107,7 @@ jobs:
       - run: exit 0
 
   push-to-tracks:
-    needs: [fetch-tracks, abort-timer]
+    needs: [fetch-repos, abort-timer]
     name: Push to ${{ matrix.track }}
     runs-on: ubuntu-20.04
     timeout-minutes: 30
@@ -122,7 +122,7 @@ jobs:
       fail-fast: false
       max-parallel: 1
       matrix:
-        track: ${{ fromJson(needs.fetch-tracks.outputs.tracks) }}
+        track: ${{ fromJson(needs.fetch-repos.outputs.tracks) }}
 
     steps:
       - name: Checkout main repo
