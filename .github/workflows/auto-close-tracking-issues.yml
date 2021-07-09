@@ -1,0 +1,18 @@
+name: Automatically close tracking issues
+
+on:
+  schedule:
+    - cron: 4 2 * * *
+
+jobs:
+  stale:
+    name: Automatically close tracking issues
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: actions/stale@98ed4cb500039dbcccf4bd9bedada4d0187f2757
+        with:
+          days-before-stale: 7
+          day-before-close: 0
+          only-labels: '👁 tracking issue'
+          stale-issue-label: '✔ tracking done'
