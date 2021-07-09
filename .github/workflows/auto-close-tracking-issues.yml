@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/stale@98ed4cb500039dbcccf4bd9bedada4d0187f2757
         with:
-          days-before-stale: 7
-          day-before-close: 0
+          days-before-stale: 6
+          day-before-close: 1
           only-labels: '👁 tracking issue'
           stale-issue-label: '✔ tracking done'
