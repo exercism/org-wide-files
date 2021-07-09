@@ -20,6 +20,30 @@ env:
   GIT_EMAIL: "66069679+exercism-bot@users.noreply.github.com"
 
 jobs:
+  open-tracking-issue:
+    name: Open tracking issue
+    runs-on: ubuntu-20.04
+
+    outputs:
+      issue-url: ${{ steps.open-tracking-issue.outputs.result }}
+    
+    steps:
+      - name: Open tracking issue
+        id: open-tracking-issue
+        uses: actions/github-script@a3e7071a34d7e1f219a8a4de9a5e0a34d1ee1293
+        with:
+          result-encoding: string
+          script: |
+            const issue = (await github.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `[Tracking] ${context.workflow} - ${context.eventName} - ${context.actor} - ${context.sha}`,
+              body: `Workflow run: https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+              labels: ['👁 tracking issue']
+            })).data
+
+            return issue.html_url
+
   fetch-repos:
     name: Fetch & fork target repos
     runs-on: ubuntu-20.04
@@ -89,7 +113,7 @@ jobs:
             await new Promise(x => setTimeout(x, 60000))
 
   abort-timer:
-    needs: fetch-repos
+    needs: [fetch-repos, open-tracking-issue]
     runs-on: ubuntu-20.04
     name: ⚠ 5 MINUTES TO ABORT
     environment: abort-timer
@@ -97,7 +121,7 @@ jobs:
       - run: exit 0
 
   push-to-repos:
-    needs: [fetch-repos, abort-timer]
+    needs: [fetch-repos, abort-timer, open-tracking-issue]
     name: Push to ${{ matrix.repo }}
     runs-on: ubuntu-20.04
     timeout-minutes: 30
@@ -224,6 +248,7 @@ jobs:
         env:
           TARGET_REPO_FULLNAME: ${{ matrix.repo }}
           BRANCH_NAME: ${{ steps.branch.outputs.name }}
+          TRACKING_ISSUE_URL: ${{ needs.open-tracking-issue.outputs.issue-url }}
         with:
           github-token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
           script: |
@@ -235,6 +260,6 @@ jobs:
               title: '🤖 Sync org-wide files to upstream repo',
               head: `exercism-bot:${process.env.BRANCH_NAME}`,
               base: 'main',
-              body: `More info: ${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/commit/${process.env.GITHUB_SHA}`,
+              body: `ℹ More info: ${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/commit/${process.env.GITHUB_SHA}\n👁 Tracking issue: ${process.env.TRACKING_ISSUE_URL}`,
               maintainer_can_modify: false
             })
