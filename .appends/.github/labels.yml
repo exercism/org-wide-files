@@ -43,6 +43,6 @@
   description: "This will not be worked on"
   color: "ffffff"
 
-- name: "tracking issue"
+- name: "👁 tracking issue"
   description: "This issue tracks the merge-status of PRs created by this repo."
   color: "ff00ff"
