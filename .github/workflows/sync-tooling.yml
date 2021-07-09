@@ -3,8 +3,8 @@ name: Sync Tooling
 on:
   workflow_dispatch:
     inputs:
-      tracks:
-        description: 'List of repos to rerun the syncing workflow for, formatted as JSON array, e.g. ["exercism/julia"]'
+      repos:
+        description: 'List of repos to rerun the syncing workflow for, formatted as JSON array, e.g. ["exercism/csharp-test-runner"]'
         required: true
         default: ""
   push:
@@ -20,23 +20,23 @@ env:
   GIT_EMAIL: "66069679+exercism-bot@users.noreply.github.com"
 
 jobs:
-  fetch-tracks:
+  fetch-repos:
     name: Fetch & fork target repos
     runs-on: ubuntu-20.04
 
     outputs:
-      tracks: ${{ steps.fetch-tracks.outputs.result }}
+      repos: ${{ steps.fetch-repos.outputs.result }}
 
     steps:
       - name: Fetch list of target repos
-        id: fetch-tracks
+        id: fetch-repos
         uses: actions/github-script@a3e7071a34d7e1f219a8a4de9a5e0a34d1ee1293
         with:
           script: |
             if (context.eventName === 'repository_dispatch') {
-              return context.payload.client_payload.tracks
+              return context.payload.client_payload.repos
             } else if (context.eventName === 'workflow_dispatch') {
-              return JSON.parse(context.payload.inputs.tracks)
+              return JSON.parse(context.payload.inputs.repos)
             } else {
               const trackRepos = await github.paginate(github.search.repos, {
                 q: 'org:exercism+topic:exercism-tooling+is:public+archived:false'
@@ -61,9 +61,9 @@ jobs:
             // TODO: The GraphQL API does have this info. Look into changing to that.
             const botForks = botRepos.flatMap(({ full_name, fork }) => fork ? [full_name.replace(process.env.BOT_USERNAME, 'exercism')] : [])
 
-            const tracks = ${{ steps.fetch-tracks.outputs.result }}
+            const repos = ${{ steps.fetch-repos.outputs.result }}
 
-            return tracks.filter(track => !botForks.includes(track))
+            return repos.filter(repo => !botForks.includes(repo))
 
       - name: Fork repos that haven't been forked yet
         if: steps.required-forks.outputs.result != '[]'
@@ -71,10 +71,10 @@ jobs:
         with:
           github-token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
           script: |
-            const trackReposFullNames = ${{ steps.required-forks.outputs.result }}
-            const trackRepos = trackReposFullNames.map((fullName) => fullName.split('/')[1])
+            const reposFullNames = ${{ steps.required-forks.outputs.result }}
+            const repos = reposFullNames.map((fullName) => fullName.split('/')[1])
 
-            for (let repo of trackRepos) {
+            for (let repo of repos) {
               await github.repos.createFork({
                 owner: 'exercism',
                 repo
@@ -89,16 +89,16 @@ jobs:
             await new Promise(x => setTimeout(x, 60000))
 
   abort-timer:
-    needs: fetch-tracks
+    needs: fetch-repos
     runs-on: ubuntu-20.04
     name: ⚠ 5 MINUTES TO ABORT
     environment: abort-timer
     steps:
       - run: exit 0
 
-  push-to-tracks:
-    needs: [fetch-tracks, abort-timer]
-    name: Push to ${{ matrix.track }}
+  push-to-repos:
+    needs: [fetch-repos, abort-timer]
+    name: Push to ${{ matrix.repo }}
     runs-on: ubuntu-20.04
     timeout-minutes: 30
 
@@ -112,7 +112,7 @@ jobs:
       fail-fast: false
       max-parallel: 1
       matrix:
-        track: ${{ fromJson(needs.fetch-tracks.outputs.tracks) }}
+        repo: ${{ fromJson(needs.fetch-repos.outputs.repos) }}
 
     steps:
       - name: Checkout main repo
@@ -123,15 +123,13 @@ jobs:
       - name: Checkout target repo
         uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f
         with:
-          repository: ${{ matrix.track }}
+          repository: ${{ matrix.repo }}
           token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
           path: track-repo
           fetch-depth: 0
 
       - name: Checkout new branch on track repo
         id: branch
-        env:
-          TRACK: ${{ matrix.track }}
         run: |
           cd track-repo
 
@@ -149,7 +147,7 @@ jobs:
       - name: Apply transformations based on track config
         shell: julia --color=yes {0}
         env:
-          TRACK: ${{ matrix.track }}
+          TRACK: ${{ matrix.repo }}
         run: |
           using TOML
 
@@ -201,7 +199,7 @@ jobs:
       - name: Commit and push changes
         if: steps.changes.outputs.changes == 'true'
         env:
-          TRACK_REPO_FULLNAME: ${{ matrix.track }}
+          TARGET_REPO_FULLNAME: ${{ matrix.repo }}
           BOT_PERSONAL_ACCESS_TOKEN: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
         run: |
           cd track-repo
@@ -216,19 +214,19 @@ jobs:
           git commit -m "🤖 Sync org-wide files to upstream repo" -m "More info: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/commit/$GITHUB_SHA"
 
           # Push commit
-          track_repo="${TRACK_REPO_FULLNAME/exercism/$BOT_USERNAME}"
-          git push "$GITHUB_SERVER_URL/$track_repo.git"
+          target_repo="${TARGET_REPO_FULLNAME/exercism/$BOT_USERNAME}"
+          git push "$GITHUB_SERVER_URL/$target_repo.git"
 
       - name: Open pull request on track repo
         if: steps.changes.outputs.changes == 'true'
         uses: actions/github-script@a3e7071a34d7e1f219a8a4de9a5e0a34d1ee1293
         env:
-          TRACK_REPO_FULLNAME: ${{ matrix.track }}
+          TARGET_REPO_FULLNAME: ${{ matrix.repo }}
           BRANCH_NAME: ${{ steps.branch.outputs.name }}
         with:
           github-token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
           script: |
-            const repo = process.env.TRACK_REPO_FULLNAME.split('/')[1]
+            const repo = process.env.TARGET_REPO_FULLNAME.split('/')[1]
 
             github.pulls.create({
               owner: 'exercism',
