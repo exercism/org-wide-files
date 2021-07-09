@@ -186,3 +186,7 @@
 - name: "👁 tracking issue"
   description: "This issue tracks the merge-status of PRs created by this repo."
   color: "ff00ff"
+
+- name: "✔ tracking done"
+  description: "This marks tracking issues as (presumably) done so that they will be auto-closed."
+  color: "e4e669"
