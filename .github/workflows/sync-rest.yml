@@ -7,8 +7,8 @@ on:
         description: 'List of repos to rerun the syncing workflow for, formatted as JSON array, e.g. ["exercism/configlet"]'
         required: true
         default: ""
-  # repository_dispatch:
-  #   types: [track_changes]
+  repository_dispatch:
+    types: [appends_update]
   push:
     branches:
       - main
