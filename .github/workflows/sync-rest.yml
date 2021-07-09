@@ -71,9 +71,9 @@ jobs:
             // TODO: The GraphQL API does have this info. Look into changing to that.
             const botForks = botRepos.flatMap(({ full_name, fork }) => fork ? [full_name.replace(process.env.BOT_USERNAME, 'exercism')] : [])
 
-            const tracks = ${{ steps.fetch-repos.outputs.result }}
+            const repos = ${{ steps.fetch-repos.outputs.result }}
 
-            return tracks.filter(track => !botForks.includes(track))
+            return repos.filter(repo => !botForks.includes(repo))
 
       - name: Fork repos that haven't been forked yet
         if: steps.required-forks.outputs.result != '[]'
@@ -81,10 +81,10 @@ jobs:
         with:
           github-token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
           script: |
-            const trackReposFullNames = ${{ steps.required-forks.outputs.result }}
-            const trackRepos = trackReposFullNames.map((fullName) => fullName.split('/')[1])
+            const reposFullNames = ${{ steps.required-forks.outputs.result }}
+            const repos = reposFullNames.map((fullName) => fullName.split('/')[1])
 
-            for (let repo of trackRepos) {
+            for (let repo of repos) {
               await github.repos.createFork({
                 owner: 'exercism',
                 repo
