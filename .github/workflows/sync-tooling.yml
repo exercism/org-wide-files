@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       tracks:
-        description: 'List of repos to rerun the syncing workflow for, formatted as JSON array, e.g. ["exercism/julia"]'
+        description: 'List of tooling repos to rerun the syncing workflow for, formatted as JSON array, e.g. ["exercism/julia"]'
         required: true
         default: ""
   push:
