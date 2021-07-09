@@ -1,0 +1,23 @@
+name: Automatically close tracking issues
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: 4 2 * * *
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale:
+    name: Automatically close tracking issues
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: actions/stale@98ed4cb500039dbcccf4bd9bedada4d0187f2757
+        with:
+          days-before-stale: 6
+          day-before-close: 1
+          only-labels: '👁 tracking issue'
+          stale-issue-label: '✔ tracking done'
