@@ -21,3 +21,4 @@ jobs:
           days-before-close: 1
           only-labels: '👁 tracking issue'
           stale-issue-label: '✔ tracking done'
+          stale-issue-message: 'Tracking is presumed to be done by now, closing issue in one day.'
