@@ -138,3 +138,6 @@
   description: "Preparing for Exercism v3"
   color: "e99695"
 
+- name: "hacktoberfest-accepted"
+  description: "Make this PR count for hacktoberfest"
+  color: "ff7518"
