@@ -32,7 +32,7 @@ jobs:
     steps:
       - name: Open tracking issue
         id: open-tracking-issue
-        uses: actions/github-script@a3e7071a34d7e1f219a8a4de9a5e0a34d1ee1293
+        uses: actions/github-script@e3cbab99d3a9b271e1b79fc96d103a4a5534998c
         with:
           result-encoding: string
           script: |
@@ -56,7 +56,7 @@ jobs:
     steps:
       - name: Fetch list of target repos
         id: fetch-repos
-        uses: actions/github-script@a3e7071a34d7e1f219a8a4de9a5e0a34d1ee1293
+        uses: actions/github-script@e3cbab99d3a9b271e1b79fc96d103a4a5534998c
         with:
           script: |
             if (context.eventName === 'repository_dispatch') {
@@ -73,7 +73,7 @@ jobs:
 
       - name: Determine target repos needing to be forked
         id: required-forks
-        uses: actions/github-script@a3e7071a34d7e1f219a8a4de9a5e0a34d1ee1293
+        uses: actions/github-script@e3cbab99d3a9b271e1b79fc96d103a4a5534998c
         with:
           github-token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
           script: |
@@ -93,7 +93,7 @@ jobs:
 
       - name: Fork repos that haven't been forked yet
         if: steps.required-forks.outputs.result != '[]'
-        uses: actions/github-script@a3e7071a34d7e1f219a8a4de9a5e0a34d1ee1293
+        uses: actions/github-script@e3cbab99d3a9b271e1b79fc96d103a4a5534998c
         with:
           github-token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
           script: |
@@ -245,7 +245,7 @@ jobs:
 
       - name: Open pull request on track repo
         if: steps.changes.outputs.changes == 'true'
-        uses: actions/github-script@a3e7071a34d7e1f219a8a4de9a5e0a34d1ee1293
+        uses: actions/github-script@e3cbab99d3a9b271e1b79fc96d103a4a5534998c
         env:
           TARGET_REPO_FULLNAME: ${{ matrix.repo }}
           BRANCH_NAME: ${{ steps.branch.outputs.name }}
