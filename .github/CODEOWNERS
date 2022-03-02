@@ -6,4 +6,5 @@ config.toml @exercism/maintainers-admin
 
 # Synced files
 /global-files/ @exercism/maintainers-admin
+/tooling-files/ @exercism/maintainers-admin
 /tracks-files/ @exercism/maintainers-admin
