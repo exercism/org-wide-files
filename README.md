@@ -2,7 +2,9 @@
 
 ## How it works
 
-On each push to the `main` branch, all files in `synced-files/` will be copied to all Exercism track repos.
+On each push to the `main` branch, all files in `global-files/` will be copied to all Exercism repos.
+The files in `tooling-files` and `tracks-files` will be copied to all tooling and track repos respectively.
+Tooling and track repos are determined by their `exercism-tooling` and `exercism-track` topic.
 A PR will be opened on each repo, which will (in the future) be automatically merged by a webhook integration.
 
 After pushing, you have 5 minutes to abort the workflow, in case there are any errors in the files that should be synced.
