@@ -28,7 +28,7 @@ jobs:
 
     outputs:
       issue-url: ${{ steps.open-tracking-issue.outputs.result }}
-    
+
     steps:
       - name: Open tracking issue
         id: open-tracking-issue
@@ -166,9 +166,10 @@ jobs:
 
           echo "::set-output name=name::$branch"
 
-      - name: Copy globally synced files to target repo
+      - name: Copy synced files to target repo
         run: |
           cp -a main/global-files/. track-repo/
+          cp -a main/tooling-files/. track-repo/
 
       - name: Apply transformations based on track config
         shell: julia --color=yes {0}

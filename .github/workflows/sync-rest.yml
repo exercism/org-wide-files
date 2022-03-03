@@ -30,7 +30,7 @@ jobs:
 
     outputs:
       issue-url: ${{ steps.open-tracking-issue.outputs.result }}
-    
+
     steps:
       - name: Open tracking issue
         id: open-tracking-issue
@@ -176,6 +176,30 @@ jobs:
 
           echo "::set-output name=name::$branch"
 
+      - name: Copy globally synced files to target repo
+        run: |
+          cp -a main/global-files/. track-repo/
+
+      - name: Determine if repo is a tooling repo
+        id: is-tooling-repo
+        uses: actions/github-script@a3e7071a34d7e1f219a8a4de9a5e0a34d1ee1293
+        env:
+          TARGET_REPO_FULLNAME: ${{ matrix.repo }}
+        with:
+          github-token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
+          script: |
+            const repoTopics = await github.paginate(github.repos.getAllTopics, {
+                owner: 'exercism',
+                repo: process.env.TARGET_REPO_FULLNAME.split('/')[1]
+              })
+
+            return repoTopics[0].names.includes('exercism-tooling')
+
+      - name: Copy tooling-only synced files to target repo
+        if: steps.is-tooling-repo.outputs.result == 'true'
+        run: |
+          cp -a main/tooling-files/. track-repo/
+
       - name: Determine if repo is a track repo
         id: is-track-repo
         uses: actions/github-script@a3e7071a34d7e1f219a8a4de9a5e0a34d1ee1293
@@ -190,10 +214,6 @@ jobs:
               })
 
             return repoTopics[0].names.includes('exercism-track')
-
-      - name: Copy globally synced files to target repo
-        run: |
-          cp -a main/global-files/. track-repo/
 
       - name: Copy tracks-only synced files to target repo
         if: steps.is-track-repo.outputs.result == 'true'

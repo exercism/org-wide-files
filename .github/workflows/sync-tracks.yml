@@ -28,7 +28,7 @@ jobs:
 
     outputs:
       issue-url: ${{ steps.open-tracking-issue.outputs.result }}
-    
+
     steps:
       - name: Open tracking issue
         id: open-tracking-issue
