@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-      - uses: actions/stale@cdf15f641adb27a71842045a94023bef6945e3aa
+      - uses: actions/stale@3cc123766321e9f15a6676375c154ccffb12a358
         with:
           days-before-stale: 6
           days-before-close: 1
