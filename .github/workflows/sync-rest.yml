@@ -38,7 +38,7 @@ jobs:
         with:
           result-encoding: string
           script: |
-            const issue = (await github.issues.create({
+            const issue = (await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
               title: `[Tracking] ${context.workflow} - ${context.eventName} - ${context.actor} - ${context.sha}`,
@@ -66,15 +66,15 @@ jobs:
             } else if (context.eventName === 'workflow_dispatch') {
               return JSON.parse(context.payload.inputs.repos)
             } else {
-              const allRepos = (await github.paginate(github.search.repos, {
+              const allRepos = (await github.paginate(github.rest.search.repos, {
                 q: 'org:exercism+is:public+archived:false'
               })).flatMap(({ full_name }) => [full_name])
 
-              const toolingRepos = (await github.paginate(github.search.repos, {
+              const toolingRepos = (await github.paginate(github.rest.search.repos, {
                 q: 'org:exercism+topic:exercism-tooling+is:public+archived:false'
               })).flatMap(({ full_name }) => [full_name])
 
-              const trackRepos = (await github.paginate(github.search.repos, {
+              const trackRepos = (await github.paginate(github.rest.search.repos, {
                 q: 'org:exercism+topic:exercism-track+is:public+archived:false'
               })).flatMap(({ full_name }) => [full_name])
 
@@ -87,7 +87,7 @@ jobs:
         with:
           github-token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
           script: |
-            const botRepos = await github.paginate(github.repos.listForAuthenticatedUser, {
+            const botRepos = await github.paginate(github.rest.repos.listForAuthenticatedUser, {
               affiliation: 'owner'
             })
 
@@ -111,7 +111,7 @@ jobs:
             const repos = reposFullNames.map((fullName) => fullName.split('/')[1])
 
             for (let repo of repos) {
-              await github.repos.createFork({
+              await github.rest.repos.createFork({
                 owner: 'exercism',
                 repo
               })
@@ -188,7 +188,7 @@ jobs:
         with:
           github-token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
           script: |
-            const repoTopics = await github.paginate(github.repos.getAllTopics, {
+            const repoTopics = await github.paginate(github.rest.repos.getAllTopics, {
                 owner: 'exercism',
                 repo: process.env.TARGET_REPO_FULLNAME.split('/')[1]
               })
@@ -208,7 +208,7 @@ jobs:
         with:
           github-token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
           script: |
-            const repoTopics = await github.paginate(github.repos.getAllTopics, {
+            const repoTopics = await github.paginate(github.rest.repos.getAllTopics, {
                 owner: 'exercism',
                 repo: process.env.TARGET_REPO_FULLNAME.split('/')[1]
               })
@@ -305,7 +305,7 @@ jobs:
           script: |
             const repo = process.env.TARGET_REPO_FULLNAME.split('/')[1]
 
-            github.pulls.create({
+            github.rest.pulls.create({
               owner: 'exercism',
               repo,
               title: '🤖 Sync org-wide files to upstream repo',
