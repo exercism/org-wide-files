@@ -1,0 +1,12 @@
+name: Configlet CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  configlet:
+    uses: exercism/github-actions/.github/workflows/configlet.yml@main
