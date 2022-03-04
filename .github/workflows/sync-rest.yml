@@ -38,10 +38,20 @@ jobs:
         with:
           result-encoding: string
           script: |
+            const title = `[Tracking] ${context.workflow} - ${context.eventName} - ${context.actor} - ${context.sha}`
+            const existingIssue = (await octokit.paginate(octokit.rest.issues.listForRepo, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            })).find((issue) => issue.title === title)
+
+            if (existingIssue) {
+              return existingIssue.html_url
+            }
+
             const issue = (await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `[Tracking] ${context.workflow} - ${context.eventName} - ${context.actor} - ${context.sha}`,
+              title: title,
               body: `Workflow run: https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
               labels: ['👁 tracking issue']
             })).data
