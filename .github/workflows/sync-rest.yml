@@ -161,12 +161,40 @@ jobs:
         repo: ${{ fromJson(needs.fetch-repos.outputs.repos) }}
 
     steps:
+      - name: Check if pull request has already been opened
+        id: pr-already-exists
+        uses: actions/github-script@9ac08808f993958e9de277fe43a64532a609130e
+        env:
+          TARGET_REPO_FULLNAME: ${{ matrix.repo }}
+          TRACKING_ISSUE_URL: ${{ needs.open-tracking-issue.outputs.issue-url }}
+        with:
+          github-token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
+          script: |
+            const repo = process.env.TARGET_REPO_FULLNAME.split('/')[1]
+
+            return (
+              await octokit.paginate(octokit.rest.issues.listForRepo, {
+                owner: "exercism",
+                repo: repo,
+              })
+            ).some((pr) =>
+              pr.body.includes(process.env.TRACKING_ISSUE_URL)
+            )
+
+      ############################################################
+      # ONLY RUN THE REST OF THE SCRIPT IF THE PR DOES NOT EXIST #
+      # All following steps must have:                           #
+      #   if: steps.pr-already-exists.outputs.result == 'false'  #
+      ###########################################################
+
       - name: Checkout main repo
+        if: steps.pr-already-exists.outputs.result == 'false'
         uses: actions/checkout@a12a3943b4bdde767164f792f33f40b04645d846
         with:
           path: main
 
       - name: Checkout target repo
+        if: steps.pr-already-exists.outputs.result == 'false'
         uses: actions/checkout@a12a3943b4bdde767164f792f33f40b04645d846
         with:
           repository: ${{ matrix.repo }}
@@ -175,6 +203,7 @@ jobs:
           fetch-depth: 0
 
       - name: Checkout new branch on track repo
+        if: steps.pr-already-exists.outputs.result == 'false'
         id: branch
         run: |
           cd track-repo
@@ -187,10 +216,12 @@ jobs:
           echo "::set-output name=name::$branch"
 
       - name: Copy globally synced files to target repo
+        if: steps.pr-already-exists.outputs.result == 'false'
         run: |
           cp -a main/global-files/. track-repo/
 
       - name: Determine if repo is a tooling repo
+        if: steps.pr-already-exists.outputs.result == 'false'
         id: is-tooling-repo
         uses: actions/github-script@9ac08808f993958e9de277fe43a64532a609130e
         env:
@@ -211,6 +242,7 @@ jobs:
           cp -a main/tooling-files/. track-repo/
 
       - name: Determine if repo is a track repo
+        if: steps.pr-already-exists.outputs.result == 'false'
         id: is-track-repo
         uses: actions/github-script@9ac08808f993958e9de277fe43a64532a609130e
         env:
@@ -231,11 +263,13 @@ jobs:
           cp -a main/tracks-files/. track-repo/
 
       - name: Apply transformations based on track config
+        if: steps.pr-already-exists.outputs.result == 'false'
         env:
           TRACK: ${{ matrix.repo }}
         run: julia --color=yes main/scripts/apply-track-config.jl
 
       - name: Check for changes
+        if: steps.pr-already-exists.outputs.result == 'false'
         id: changes
         run: |
           cd track-repo
