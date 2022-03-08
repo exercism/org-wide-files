@@ -47,6 +47,7 @@ jobs:
             })).find((issue) => issue.title === title)
 
             if (existingIssue) {
+              console.log(`::notice::Existing issue found: ${existingIssue.html_url}`)
               return existingIssue.html_url
             }
 
