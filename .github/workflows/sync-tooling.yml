@@ -170,6 +170,7 @@ jobs:
               await octokit.paginate(octokit.rest.issues.listForRepo, {
                 owner: "exercism",
                 repo: repo,
+                state: 'open',
               })
             ).some((pr) =>
               pr.body.includes(process.env.TRACKING_ISSUE_URL)
