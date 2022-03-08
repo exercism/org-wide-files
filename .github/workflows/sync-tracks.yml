@@ -173,7 +173,7 @@ jobs:
                 state: 'open',
               })
             ).some((pr) =>
-              pr.body.includes(process.env.TRACKING_ISSUE_URL)
+              pr.body && pr.body.includes(process.env.TRACKING_ISSUE_URL)
             )
 
       ############################################################
