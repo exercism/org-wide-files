@@ -167,15 +167,22 @@ jobs:
           script: |
             const repo = process.env.TARGET_REPO_FULLNAME.split('/')[1]
 
-            return (
+            const existingPr = (
               await github.paginate(github.rest.issues.listForRepo, {
                 owner: "exercism",
                 repo: repo,
                 state: 'open',
               })
-            ).some((pr) =>
+            ).find((pr) =>
               pr.body && pr.body.includes(process.env.TRACKING_ISSUE_URL)
             )
+
+            if (existingPr) {
+              console.log(`::notice::Existing pull request found: ${existingPr.html_url}`)
+              return true
+            }
+
+            return false
 
       ############################################################
       # ONLY RUN THE REST OF THE SCRIPT IF THE PR DOES NOT EXIST #
