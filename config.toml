@@ -3,3 +3,8 @@ appendable_files = [
     "CODE_OF_CONDUCT.md",
     ".github/labels.yml",
 ]
+
+# Configlet workflow settings
+configlet_configurable_keys = [
+    "fmt"
+]
