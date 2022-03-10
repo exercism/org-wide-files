@@ -16,7 +16,7 @@ if isfile(track_cfg_file)
             haskey(track_cfg["configlet"], key) || continue
 
             if track_cfg["configlet"]["fmt"]
-                @info "Track wants to run configlet fmt; appending configlet workflow"
+                @info "Track wants to run configlet fmt; appending to configlet workflow"
 
                 open(joinpath("track-repo", ".github", "workflows", "configlet.yml"), "a") do io
                     write(io, "    with:\n      fmt: true\n")
