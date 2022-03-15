@@ -325,7 +325,7 @@ jobs:
 
           # Push commit
           target_repo="${TARGET_REPO_FULLNAME/exercism/$BOT_USERNAME}"
-          git push "$GITHUB_SERVER_URL/$target_repo.git"
+          git push --force "$GITHUB_SERVER_URL/$target_repo.git"
 
       - name: Open pull request on track repo
         if: steps.changes.outputs.changes == 'true'
