@@ -15,7 +15,7 @@ To trigger a rerun of the syncer for a list of repos, [create a repository dispa
 
 ```json
 {
-  "event_type": "appends_update",
+  "event_type": "repo_update",
   "client_payload": {
     "repos": ["exercism/julia"],
     "pusher": "helpful-user"

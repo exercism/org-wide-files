@@ -8,7 +8,7 @@ on:
         required: true
         default: ""
   repository_dispatch:
-    types: [appends_update]
+    types: [appends_update, repo_update]
   push:
     branches:
       - main
