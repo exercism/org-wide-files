@@ -39,8 +39,20 @@ for file in global_cfg["appendable_files"]
     # Read content of append file
     append_content = read(append_path, String)
 
+    # Read org-wide file
+    org_wide_content = readchomp(joinpath("track-repo", file))
+
     # Append file
-    open(joinpath("track-repo", file), "a") do io
+    open(joinpath("track-repo", file), "w") do io
+        # Write org-wide content
+        write(io, org_wide_content)
+
+        # Add or remove trailing newlines depending on global config
+        # The default assumption is one trailing newline
+        newlines = haskey(global_cfg["files"], file) ? get(global_cfg["files"][file], "trailing_newlines", 1) : 1
+        write(io, "\n" ^ newlines)
+
+        # Write append content
         write(io, append_content)
 
         @info "Appended $file" append_content

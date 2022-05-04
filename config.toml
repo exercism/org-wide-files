@@ -8,3 +8,11 @@ appendable_files = [
 configlet_configurable_keys = [
     "fmt"
 ]
+
+# File-specific config
+[files]
+[files."CODE_OF_CONDUCT.md"]
+trailing_newlines = 2
+
+[files.".github/labels.yml"]
+trailing_newlines = 2
