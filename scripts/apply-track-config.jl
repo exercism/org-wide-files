@@ -39,7 +39,7 @@ for file in global_cfg["appendable_files"]
     # Read content of append file
     append_content = read(append_path, String)
 
-    # Read org-wide-file file
+    # Read org-wide file
     org_wide_content = readchomp(joinpath("track-repo", file))
 
     # Append file
