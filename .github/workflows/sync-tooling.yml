@@ -32,7 +32,7 @@ jobs:
     steps:
       - name: Open tracking issue
         id: open-tracking-issue
-        uses: actions/github-script@d50f485531ba88479582bc2da03ff424389af5c1
+        uses: actions/github-script@d4560e157075e2d93aa3022b5b51a42a880f1f93
         with:
           result-encoding: string
           script: |
@@ -71,7 +71,7 @@ jobs:
     steps:
       - name: Fetch list of target repos
         id: fetch-repos
-        uses: actions/github-script@d50f485531ba88479582bc2da03ff424389af5c1
+        uses: actions/github-script@d4560e157075e2d93aa3022b5b51a42a880f1f93
         with:
           script: |
             if (context.eventName === 'repository_dispatch') {
@@ -88,7 +88,7 @@ jobs:
 
       - name: Determine target repos needing to be forked
         id: required-forks
-        uses: actions/github-script@d50f485531ba88479582bc2da03ff424389af5c1
+        uses: actions/github-script@d4560e157075e2d93aa3022b5b51a42a880f1f93
         with:
           github-token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
           script: |
@@ -108,7 +108,7 @@ jobs:
 
       - name: Fork repos that haven't been forked yet
         if: steps.required-forks.outputs.result != '[]'
-        uses: actions/github-script@d50f485531ba88479582bc2da03ff424389af5c1
+        uses: actions/github-script@d4560e157075e2d93aa3022b5b51a42a880f1f93
         with:
           github-token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
           script: |
@@ -158,7 +158,7 @@ jobs:
     steps:
       - name: Check if pull request has already been opened
         id: pr-already-exists
-        uses: actions/github-script@d50f485531ba88479582bc2da03ff424389af5c1
+        uses: actions/github-script@d4560e157075e2d93aa3022b5b51a42a880f1f93
         env:
           TARGET_REPO_FULLNAME: ${{ matrix.repo }}
           TRACKING_ISSUE_URL: ${{ needs.open-tracking-issue.outputs.issue-url }}
@@ -278,7 +278,7 @@ jobs:
 
       - name: Open pull request on track repo
         if: steps.changes.outputs.changes == 'true'
-        uses: actions/github-script@d50f485531ba88479582bc2da03ff424389af5c1
+        uses: actions/github-script@d4560e157075e2d93aa3022b5b51a42a880f1f93
         env:
           TARGET_REPO_FULLNAME: ${{ matrix.repo }}
           BRANCH_NAME: ${{ steps.branch.outputs.name }}
