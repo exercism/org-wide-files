@@ -226,7 +226,7 @@ jobs:
           branch="🤖/org-wide-files/${{ github.run_id }}"
           git checkout -b "$branch"
 
-          echo "::set-output name=name::$branch"
+          echo "name=$branch" >> $GITHUB_OUTPUT
 
       - name: Copy globally synced files to target repo
         if: steps.pr-already-exists.outputs.result == 'false'
@@ -292,7 +292,7 @@ jobs:
             exit 0
           fi
 
-          echo "::set-output name=changes::true"
+          echo "changes=true" >> $GITHUB_OUTPUT
 
       ########################################################
       # ONLY RUN THE REST OF THE SCRIPT IF THERE ARE CHANGES #
