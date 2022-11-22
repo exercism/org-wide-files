@@ -84,6 +84,7 @@ jobs:
               })
 
               return trackRepos.flatMap(({ full_name }) => [full_name])
+                               .concat('exercism/generic-track')
             }
 
       - name: Determine target repos needing to be forked
