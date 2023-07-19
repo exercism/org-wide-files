@@ -1,0 +1,19 @@
+name: Backup
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: 0 0 * * * # Daily
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    if: github.repository_owner == 'exercism' # Stops this job from running on forks.
+    name: Backup
+    uses: exercism/github-actions/.github/workflows/backup-repo.yml@backup-repo
+    secrets: inherit
