@@ -34,7 +34,7 @@ jobs:
     steps:
       - name: Open tracking issue
         id: open-tracking-issue
-        uses: actions/github-script@d556feaca394842dc55e4734bf3bb9f685482fa0
+        uses: actions/github-script@98814c53be79b1d30f795b907e553d8679345975
         with:
           result-encoding: string
           script: |
@@ -73,7 +73,7 @@ jobs:
     steps:
       - name: Fetch list of target repos
         id: fetch-repos
-        uses: actions/github-script@d556feaca394842dc55e4734bf3bb9f685482fa0
+        uses: actions/github-script@98814c53be79b1d30f795b907e553d8679345975
         with:
           script: |
             if (context.eventName === 'repository_dispatch') {
@@ -98,7 +98,7 @@ jobs:
 
       - name: Determine target repos needing to be forked
         id: required-forks
-        uses: actions/github-script@d556feaca394842dc55e4734bf3bb9f685482fa0
+        uses: actions/github-script@98814c53be79b1d30f795b907e553d8679345975
         with:
           github-token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
           script: |
@@ -118,7 +118,7 @@ jobs:
 
       - name: Fork repos that haven't been forked yet
         if: steps.required-forks.outputs.result != '[]'
-        uses: actions/github-script@d556feaca394842dc55e4734bf3bb9f685482fa0
+        uses: actions/github-script@98814c53be79b1d30f795b907e553d8679345975
         with:
           github-token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
           script: |
@@ -168,7 +168,7 @@ jobs:
     steps:
       - name: Check if pull request has already been opened
         id: pr-already-exists
-        uses: actions/github-script@d556feaca394842dc55e4734bf3bb9f685482fa0
+        uses: actions/github-script@98814c53be79b1d30f795b907e553d8679345975
         env:
           TARGET_REPO_FULLNAME: ${{ matrix.repo }}
           TRACKING_ISSUE_URL: ${{ needs.open-tracking-issue.outputs.issue-url }}
@@ -236,7 +236,7 @@ jobs:
       - name: Determine if repo is a tooling repo
         if: steps.pr-already-exists.outputs.result == 'false'
         id: is-tooling-repo
-        uses: actions/github-script@d556feaca394842dc55e4734bf3bb9f685482fa0
+        uses: actions/github-script@98814c53be79b1d30f795b907e553d8679345975
         env:
           TARGET_REPO_FULLNAME: ${{ matrix.repo }}
         with:
@@ -257,7 +257,7 @@ jobs:
       - name: Determine if repo is a track repo
         if: steps.pr-already-exists.outputs.result == 'false'
         id: is-track-repo
-        uses: actions/github-script@d556feaca394842dc55e4734bf3bb9f685482fa0
+        uses: actions/github-script@98814c53be79b1d30f795b907e553d8679345975
         env:
           TARGET_REPO_FULLNAME: ${{ matrix.repo }}
         with:
@@ -329,7 +329,7 @@ jobs:
 
       - name: Open pull request on track repo
         if: steps.changes.outputs.changes == 'true'
-        uses: actions/github-script@d556feaca394842dc55e4734bf3bb9f685482fa0
+        uses: actions/github-script@98814c53be79b1d30f795b907e553d8679345975
         env:
           TARGET_REPO_FULLNAME: ${{ matrix.repo }}
           BRANCH_NAME: ${{ steps.branch.outputs.name }}
