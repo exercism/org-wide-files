@@ -223,7 +223,7 @@ jobs:
 
           # github.run_id is a unique number for each run within a repository.
           # WARNING: the run_id will NOT be updated if a workflow is re-run
-          branch="🤖/org-wide-files/${{ github.run_id }}"
+          branch="org-wide-files/${{ github.run_id }}"
           git checkout -b "$branch"
 
           echo "name=$branch" >> $GITHUB_OUTPUT
