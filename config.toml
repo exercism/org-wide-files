@@ -2,6 +2,7 @@
 appendable_files = [
     "CODE_OF_CONDUCT.md",
     ".github/labels.yml",
+    ".gitattributes",
 ]
 
 # Configlet workflow settings
