@@ -24,7 +24,7 @@ env:
 jobs:
   open-tracking-issue:
     name: Open tracking issue
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-26.04
 
     outputs:
       issue-url: ${{ steps.open-tracking-issue.outputs.result }}
@@ -63,7 +63,7 @@ jobs:
 
   fetch-repos:
     name: Fetch & fork target repos
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-26.04
 
     outputs:
       repos: ${{ steps.fetch-repos.outputs.result }}
@@ -132,7 +132,7 @@ jobs:
 
   abort-timer:
     needs: [fetch-repos, open-tracking-issue]
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-26.04
     name: ⚠ 5 MINUTES TO ABORT
     environment: abort-timer
     steps:
@@ -141,7 +141,7 @@ jobs:
   push-to-repos:
     needs: [fetch-repos, abort-timer, open-tracking-issue]
     name: Push to ${{ matrix.repo }}
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 30
 
     # Launch one job per track.
