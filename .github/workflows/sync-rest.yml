@@ -202,13 +202,13 @@ jobs:
 
       - name: Checkout main repo
         if: steps.pr-already-exists.outputs.result == 'false'
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           path: main
 
       - name: Checkout target repo
         if: steps.pr-already-exists.outputs.result == 'false'
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           repository: ${{ matrix.repo }}
           token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
