@@ -228,7 +228,7 @@ jobs:
         if: steps.pr-already-exists.outputs.result == 'false'
         env:
           TRACK: ${{ matrix.repo }}
-        run: julia --color=yes main/scripts/apply-track-config.jl
+        run: python3 main/scripts/apply-track-config.py
 
       - name: Check for changes
         if: steps.pr-already-exists.outputs.result == 'false'
